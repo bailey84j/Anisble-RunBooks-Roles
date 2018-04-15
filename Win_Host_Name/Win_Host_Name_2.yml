@@ -1,0 +1,21 @@
+---
+- hosts: windows
+  vars:
+     services: "{{ lookup('file', './services') }}"  
+  tasks:
+  - name: "Loop through Services"
+    win_service:
+      name: "{{ item }}"
+    register: service_info
+    with_items:
+      - DHCP
+      - CCMEXEC
+      - BITS 
+
+  - name: "Loop through Services - 2"
+    win_service:
+      name: "{{ item }}"
+    register: service_info
+    with_items: 
+    -  "{{ services }}"
+

@@ -1,0 +1,25 @@
+---
+- hosts: windows
+  #vars:
+    # services: "{{ lookup('csvfile', 'file=services.csv delimiter=,') }}"
+  tasks:
+  - name: "check services"
+    win_service:
+       name: "{{ item }}"
+    register: result
+    failed_when: result.exists == False
+    #ignore_errors: yes
+    with_items:
+    - DHCP
+    - BITS
+
+  - name: Check HostName
+    raw: $($env:computername).trim()
+    register: ComputerName
+    failed_when: ComputerName.stdout != "DSC-Node-007\r\n"
+    changed_when: False
+
+  #- debug: msg="{{result}}"
+
+  #- debug: msg="running"
+  # when: result.exists == False

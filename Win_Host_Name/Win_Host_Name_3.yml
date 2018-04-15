@@ -1,0 +1,27 @@
+---
+- hosts: windows
+  vars:
+     services: "{{ lookup('file', './services') }}"  
+  tasks:
+  - set_fact:
+      returncode:{}
+
+  - name: "Loop through Services"
+    win_service:
+      name: "{{ item }}"
+    register: state
+    ignore_errors: yes
+    with_items:
+      - DHCP
+      - CCMEXEC
+      - BITS 
+
+  - set_fact:
+      returncode: "{{ returncode|default({}) | combine( {item.item:item.rc} ) }}"
+    with_items:
+      - "{{state.results}}"
+
+  - debug: var=item
+    when: item.value == 1
+    with_dict: "{{ returncode }}"
+

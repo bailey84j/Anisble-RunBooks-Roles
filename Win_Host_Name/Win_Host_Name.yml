@@ -1,0 +1,10 @@
+---
+- hosts: windows
+  tasks:
+  - name: winrm-service
+    win_shell: "get-service -name winrm"
+
+  - name: "Check if a service is installed"
+    win_service:
+      name: EventLog
+    register: service_info

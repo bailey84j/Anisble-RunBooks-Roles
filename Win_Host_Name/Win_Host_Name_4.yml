@@ -1,0 +1,24 @@
+---
+- hosts: windows
+  vars:
+     services: "{{ lookup('file', './services') }}"  
+  tasks:
+  - name: "Loop through Services"
+    win_service:
+      name: "{{ item }}"
+    register: result
+    failed_when: result is not defined
+    #ignore_errors: yes
+    with_items:
+       - DHCP
+       - CCMEXEC
+       - BITS
+       - TESTING
+
+  - debug: msg="{{ item.results }}"
+    with_items:
+      - "{{ result }}"
+
+  - debug: msg="running"
+    when: result.state is not defined or result.name is not defined
+
