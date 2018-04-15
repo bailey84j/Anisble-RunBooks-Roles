@@ -3,23 +3,27 @@
   #vars:
     # services: "{{ lookup('csvfile', 'file=services.csv delimiter=,') }}"
   tasks:
-  - name: "check services"
+  - name: Check Services Exist
     win_service:
        name: "{{ item }}"
-    register: result
-    failed_when: result.exists == False
+    register: Services
+    failed_when: Services.exists == False
     #ignore_errors: yes
     with_items:
     - DHCP
     - BITS
+    - CCMEXEC
+
+  - debug: msg="{{Services}}"
 
   - name: Check HostName
     raw: $($env:computername).trim()
     register: ComputerName
-    failed_when: ComputerName.stdout != "DSC-Node-007\r\n"
+    failed_when: not ( ComputerName.stdout_lines|join("\r\n") is  match("^DSC-Node"))
     changed_when: False
 
-  #- debug: msg="{{result}}"
+  - debug: msg="{{ComputerName.stdout_lines|join("\r\n")}}"
+
 
   #- debug: msg="running"
   # when: result.exists == False
